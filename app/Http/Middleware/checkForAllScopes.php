@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 
-class checkForAllScopes
+class CheckForAllScopes
 {
     /**
      * Handle an incoming request.

@@ -3,32 +3,32 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-class AuthController extends Controller
+class AdminController extends Controller
 {
     //
     public function register(Request $request) {
         $fields = $request->validate([
             'name' => 'required|string',
-            'email' => 'required|string|unique:users,email',
+            'username' => 'required|string|unique:admins,username',
             'password' => 'required|string|confirmed',
         ]);
-        $user = User::create([
+        $admin = Admin::create([
             'name' => $fields['name'],
-            'email' => $fields['email'],
+            'username' => $fields['username'],
             'password' => bcrypt($fields['password'])
         ]);
 
         // $token = $user->createToken('myapptoken')->plainTextToken;
-        $token = $user->createToken('Personal Access Token', ['user'])->accessToken;
+        $token = $admin->createToken('Personal Access Token', ['admin'])->accessToken;
 
 
         $response = [
-            'user' => $user,
+            'admin' => $admin,
             'token' => $token
         ];
 
@@ -45,25 +45,25 @@ class AuthController extends Controller
 
     public function login(Request $request) {
         $fields = $request->validate([
-            'email' => 'required|string',
+            'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
         //check email
-        $user = User::where('email', $fields['email'])->first();
+        $admin = Admin::where('username', $fields['username'])->first();
         
         //Check password
-        if(!$user || !Hash::check($fields['password'], $user->password)) {
+        if(!$admin || !Hash::check($fields['password'], $admin->password)) {
             return response([
                 'message' => 'Bad credentials'
             ], 401);
         }
         // $token = $user->createToken('myapptoken')->plainTextToken;
-        $token = $user->createToken('Personal Access Token', ['user'])->accessToken;
+        $token = $admin->createToken('Personal Access Token', ['admin'])->accessToken;
 
 
         $response = [
-            'user' => $user,
+            'admin' => $admin,
             'token' => $token
         ];
 
