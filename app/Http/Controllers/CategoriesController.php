@@ -9,11 +9,10 @@ use App\Models\Categories;
 
 class CategoriesController extends Controller
 {
+
     public function show($slug)
     {
-        if($slug == 'police') {
 
-        }
         $catagoryAndChildren = DB::select(DB::raw(
             "SELECT node.category_name, (COUNT(parent.category_name) - (sub_tree.depth + 1)) AS depth
             FROM categories AS node, categories AS parent, categories AS sub_parent,
@@ -24,11 +23,11 @@ class CategoriesController extends Controller
                     ORDER BY node.lft) AS sub_tree
             WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt 
             AND sub_parent.category_name = sub_tree.category_name
-            GROUP BY node.category_name, sub_tree.depth
+            GROUP BY node.category_name
             HAVING depth <= 1
             ORDER BY node.lft;"
         ));
-        
-        return [$catagoryAndChildren];
+   
+        return $catagoryAndChildren;
     }
 }
