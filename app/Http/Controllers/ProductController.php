@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Categories;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -39,9 +42,21 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        return Product::find($id);
+        $product = DB::select(DB::raw(
+            "SELECT * from products WHERE slug = " . "'" . $slug  . "'" 
+        ));
+        $product = $product[0];
+
+        $categoryTree = DB::select(DB::raw(
+            "SELECT parent.slug, parent.category_name FROM categories AS node, categories AS parent
+            WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.id = ". $product->category_id . "
+            ORDER BY parent.lft"
+        ));
+
+        
+        return [$product, $categoryTree];
     }
 
     /**

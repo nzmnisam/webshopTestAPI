@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\CategoriesController;
 
 //AuthController = UserController
 /*
@@ -31,8 +31,12 @@ Route::post('/register/admin', [AdminController::class, 'register']);
 //Admin  login
 Route::post('/login/admin', [AdminController::class, 'login']);
 Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('products/search/{name}', [ProductController::class, 'search']);
+
+//Categories Routes
+Route::get('/categories/{slug}', [CategoriesController::class, 'show']);
+
 
 //Protected routes, needs a token and general user scope
 Route::group(['middleware' => ['auth:user','scopes:user']], function() {
