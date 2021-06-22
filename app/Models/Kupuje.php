@@ -9,12 +9,11 @@ class Kupuje extends Model
 {
     use HasFactory;
     
-    protected $primaryKey = ['UserID', 'ProductID'];//nije radilo, morao sam u sqlyog da namestim da je primary key
+    protected $primaryKey = ['user_id', 'product_id'];//nije radilo, morao sam u sqlyog da namestim da je primary key
     public $incrementing = false;
     
     protected $fillable = [
-        'UserID',
-        'ProductID',
-        'date',
+        'user_id',
+        'product_id',
     ];
 }

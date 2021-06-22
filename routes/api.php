@@ -6,6 +6,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\ImagesController;
+use App\Http\Controllers\KupujeController;
+use App\Http\Controllers\MestosController;
+use App\Http\Controllers\ModelsController;
+
+use App\Models\Images;
 
 //AuthController = UserController
 /*
@@ -30,12 +36,45 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register/admin', [AdminController::class, 'register']);
 //Admin  login
 Route::post('/login/admin', [AdminController::class, 'login']);
+//Products routes
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/category/{category_id}', [ProductController::class, 'showByCategory']);
+Route::get('/products/categories/{categories_id}', [ProductController::class, 'showByCategories']);
+Route::get('/products/similar/{product_id}', [ProductController::class, 'showSimilar']);
+
+
 Route::get('/products/{slug}', [ProductController::class, 'show']);
+Route::get('/products/id/{id}', [ProductController::class, 'showById']);
 Route::get('products/search/{name}', [ProductController::class, 'search']);
+
+//City routes
+Route::get('/cities', [MestosController::class, 'index']);
 
 //Categories Routes
 Route::get('/categories/{slug}', [CategoriesController::class, 'show']);
+Route::get('/categories/all/all', [CategoriesController::class, 'showAll']);
+Route::get('/categories/subCategories/{slug}', [CategoriesController::class, 'showSubCategories']);
+Route::get('/categories/ancestors/{category_id}', [CategoriesController::class, 'ancestors']);
+
+
+//Images routes
+Route::get('/images', [ImagesController::class, 'index']);
+Route::get('/thumbnails', [ImagesController::class, 'getThumbnails']);
+Route::get('/thumbnails/{productIds}', [ImagesController::class, 'getThumbnailsForSimilar']);
+Route::get('/images/{product_id}', [ImagesController::class, 'getImagesForProduct']);
+
+
+//Model routes
+Route::get('/models/{product_id}', [ModelsController::class, 'getModelForProduct']);
+
+
+
+//Premestiti u scope za usera
+Route::get('/kupuje/product/{id}', [KupujeController::class, 'showByProduct']);
+//na frontu uraditi da user moze da brise svoju istoriju kupovine
+
+//Premestiti u scope za admina
+
 
 
 //Protected routes, needs a token and general user scope
@@ -44,14 +83,43 @@ Route::group(['middleware' => ['auth:user','scopes:user']], function() {
     // Route::put('/products/{id}', [ProductController::class,'update']);
     // Route::delete('/products/{id}', [ProductController::class,'destroy']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    //kupovina
+    Route::get('/kupuje', [KupujeController::class, 'index']); 
+    Route::post('/kupuje', [KupujeController::class, 'store']);
 
 
 });
 //Protected routes, needs a token and admin scope
+
+Route::delete('/products/{id}', [ProductController::class,'destroy']);
+
 Route::group(['middleware' => ['auth:admin','scopes:admin']], function() {
+    //Product routes
     Route::post('/products', [ProductController::class,'store']);
     Route::put('/products/{id}', [ProductController::class,'update']);
     Route::delete('/products/{id}', [ProductController::class,'destroy']);
+    //Store product images
+    Route::post('/images', [ImagesController::class, 'store']);
+    Route::put('/images/product_id', [ImagesController::class, 'setProductId']);
+    Route::put('/images/product_id/update', [ImagesController::class, 'setProductIdUpdate']);
+
+    //Delete images
+    Route::delete('/images/{id}', [ImagesController::class, 'destroy']);
+
+    //Store product model
+    Route::post('/models', [ModelsController::class, 'store']);
+    Route::put('/models/product_id/{id}', [ModelsController::class, 'setProductId']);
+    //Delete images
+    Route::delete('/models/{id}', [ModelsController::class, 'destroy']);
+
+
+    //kupovina
+    Route::get('/kupuje/user/{id}', [KupujeController::class, 'showByUser']);
+    Route::delete('/kupuje/deleteByUser/{id}', [KupujeController::class, 'deleteByUser']);
+    Route::delete('/kupuje/deleteByProduct/{id}', [KupujeController::class, 'deleteByProduct']);
+    Route::delete('/kupuje', [KupujeController::class, 'delete']);
+
+    //Logout route
     Route::post('/logout/admin', [AdminController::class, 'logout']);
 });
 
