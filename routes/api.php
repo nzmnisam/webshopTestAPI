@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\KupujeController;
@@ -70,22 +71,31 @@ Route::get('/models/{product_id}', [ModelsController::class, 'getModelForProduct
 
 
 //Premestiti u scope za usera
-Route::get('/kupuje/product/{id}', [KupujeController::class, 'showByProduct']);
-//na frontu uraditi da user moze da brise svoju istoriju kupovine
+
+
 
 //Premestiti u scope za admina
 
+//Napraviti zajednicki scope koji prihvata oba tokena
+Route::post('/cart', [CartController::class, 'store']);
+Route::post('/cart/many', [CartController::class, 'deleteFromCart']);
+Route::post('/cart/one', [CartController::class, 'deleteOneFromCart']);
+Route::post('/cart/all', [CartController::class, 'deleteAllFromCart']);
 
 
 //Protected routes, needs a token and general user scope
 Route::group(['middleware' => ['auth:user','scopes:user']], function() {
-    // Route::post('/products', [ProductController::class,'store']);
-    // Route::put('/products/{id}', [ProductController::class,'update']);
-    // Route::delete('/products/{id}', [ProductController::class,'destroy']);
     Route::post('/logout', [AuthController::class, 'logout']);
     //kupovina
+    //na frontu uraditi da user moze da brise svoju istoriju kupovine
     Route::get('/kupuje', [KupujeController::class, 'index']); 
     Route::post('/kupuje', [KupujeController::class, 'store']);
+    Route::get('/kupuje/product/{id}', [KupujeController::class, 'showByProduct']);
+    //Cart
+    Route::get('/cart/user/{id}', [CartController::class, 'getCartForUser']);
+
+
+
 
 
 });
@@ -117,7 +127,10 @@ Route::group(['middleware' => ['auth:admin','scopes:admin']], function() {
     Route::get('/kupuje/user/{id}', [KupujeController::class, 'showByUser']);
     Route::delete('/kupuje/deleteByUser/{id}', [KupujeController::class, 'deleteByUser']);
     Route::delete('/kupuje/deleteByProduct/{id}', [KupujeController::class, 'deleteByProduct']);
-    Route::delete('/kupuje', [KupujeController::class, 'delete']);
+    Route::post('/kupuje/delete', [KupujeController::class, 'delete']);
+    //cart
+    Route::get('/cart/admin/{id}', [CartController::class, 'getCartForAdmin']);
+
 
     //Logout route
     Route::post('/logout/admin', [AdminController::class, 'logout']);
